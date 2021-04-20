@@ -24,12 +24,16 @@ class TrilixEventsApiExtension extends Extension
 
         $config = $this->processConfiguration(new Configuration(), $configs);
 
-        $transportFactory = $config['transport']['factory'];
-        $transportOptions = $config['transport']['options'] ?? [];
-
         $transportDefinition = new Definition(Transport::class);
-        $transportDefinition->setFactory([$container->findDefinition($transportFactory), 'create']);
-        $transportDefinition->setArguments([$transportOptions]);
+
+        $transport = $config['transport'] ?? null;
+        if ($transport) {
+            $transportFactory = $config['transport']['factory'] ?? null;
+            $transportOptions = $config['transport']['options'] ?? [];
+
+            $transportDefinition->setFactory([$container->findDefinition($transportFactory), 'create']);
+            $transportDefinition->setArguments([$transportOptions]);
+        }
 
         $container->setDefinition('pim_events_api.transport.default', $transportDefinition);
     }
